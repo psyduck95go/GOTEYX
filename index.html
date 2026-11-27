@@ -151,6 +151,20 @@ tailwind.config = {
   /* 數量輸入隱藏箭頭 */
   input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   /* ---------- 現煎中動畫 ---------- */
+  .live-bg {
+    background-color: #FFF8E6;
+    background-image:
+      radial-gradient(ellipse 38% 55% at 27% 55%, rgba(255,210,63,.55), transparent 70%),
+      radial-gradient(ellipse 30% 45% at 80% 40%, rgba(255,143,196,.22), transparent 70%),
+      radial-gradient(circle, rgba(232,69,127,.16) 2.5px, transparent 3px);
+    background-size: 100% 100%, 100% 100%, 28px 28px;
+  }
+  @media (max-width: 767px) {
+    .live-bg { background-image:
+      radial-gradient(ellipse 70% 22% at 50% 20%, rgba(255,210,63,.55), transparent 70%),
+      radial-gradient(ellipse 60% 25% at 70% 75%, rgba(255,143,196,.2), transparent 70%),
+      radial-gradient(circle, rgba(232,69,127,.16) 2.5px, transparent 3px); }
+  }
   .pan-stage .pt { transform-box: fill-box; transform-origin: 50% 50%; animation: ptFlip 4s cubic-bezier(.45,0,.3,1) infinite; animation-delay: var(--d, 0s); }
   .pan-stage .pt .face-top { animation: faceTop 4s steps(1, end) infinite; animation-delay: var(--d, 0s); }
   .pan-stage .pt .face-crust { opacity: 0; animation: faceCrust 4s steps(1, end) infinite; animation-delay: var(--d, 0s); }
@@ -373,7 +387,12 @@ tailwind.config = {
   <!-- =========================================================
        LIVE：現煎中動畫
   ========================================================= -->
-  <section aria-label="鍋貼現煎中" class="relative overflow-hidden border-y-[2.5px] border-wood-800 bg-sun py-16 md:py-20">
+  <section aria-label="鍋貼現煎中" class="live-bg relative overflow-hidden border-y-[2.5px] border-wood-800 py-16 md:py-20">
+    <!-- 背景漂浮塗鴉 -->
+    <svg class="floaty pointer-events-none absolute left-[3%] top-8 h-9 w-9" style="--r:-12deg" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l4.5 11 11.5 1-9 7.5 3 11.5L20 27.5 10 34l3-11.5L4 15l11.5-1z" fill="#FFD23F" stroke="#1E2A44" stroke-width="2.5" stroke-linejoin="round"/></svg>
+    <svg class="floaty pointer-events-none absolute right-[4%] top-10 h-8 w-8" style="--r:15deg;animation-delay:-1.2s" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35s-14-8-14-18a7.5 7.5 0 0 1 14-4 7.5 7.5 0 0 1 14 4c0 10-14 18-14 18z" fill="#FF8FC4" stroke="#1E2A44" stroke-width="2.5" stroke-linejoin="round"/></svg>
+    <svg class="floaty pointer-events-none absolute bottom-8 right-[12%] h-8 w-8" style="--r:8deg;animation-delay:-2.2s" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" fill="#7DB9F7" stroke="#1E2A44" stroke-width="2.5"/><path d="M12 18q8 -8 16 0" fill="none" stroke="#FFFDF8" stroke-width="3" stroke-linecap="round"/></svg>
+    <svg class="pointer-events-none absolute bottom-10 left-[40%] h-6 w-20 opacity-70" viewBox="0 0 100 30" aria-hidden="true"><path d="M5 15 q 10 -12 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="#3CC48A" stroke-width="6" stroke-linecap="round"/></svg>
     <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 md:grid-cols-2 lg:gap-16 lg:px-8">
       <div class="pan-stage mx-auto w-full max-w-xl">
         <svg viewBox="0 0 600 440" class="w-full overflow-visible" role="img" aria-label="平底鍋上的鍋貼正被一顆顆翻煎，冒著熱氣與油花">
