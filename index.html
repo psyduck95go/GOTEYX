@@ -195,10 +195,12 @@ tailwind.config = {
   @keyframes sizzleWord { 0%, 100% { transform: rotate(-6deg) scale(1); } 50% { transform: rotate(-2deg) scale(1.1); } }
   .live-dot { animation: liveDot 1s ease-in-out infinite; }
   @keyframes liveDot { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
-  @media (prefers-reduced-motion: reduce) {
-    .pan-stage *, .live-dot { animation: none !important; }
-    .pan-stage .steam { opacity: .8; }
-  }
+  #pan3d > svg { pointer-events: none; }
+  #pan3d.is-3d > svg { display: none; }
+  #pan3d .sizzle-bubble { display: none; transform-origin: 20% 100%; animation: sizzleBubble 1.2s ease-in-out infinite; }
+  #pan3d.is-3d .sizzle-bubble { display: block; }
+  #pan3d canvas { touch-action: pan-y; }
+  @keyframes sizzleBubble { 0%, 100% { transform: rotate(-6deg) scale(1); } 50% { transform: rotate(-2deg) scale(1.12); } }
   @media (prefers-reduced-motion: reduce) { .floaty, .wiggle, .map-pin, .map-ping { animation: none; } }
 </style>
 </head>
@@ -395,7 +397,9 @@ tailwind.config = {
     <svg class="pointer-events-none absolute bottom-10 left-[40%] h-6 w-20 opacity-70" viewBox="0 0 100 30" aria-hidden="true"><path d="M5 15 q 10 -12 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="#3CC48A" stroke-width="6" stroke-linecap="round"/></svg>
     <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 md:grid-cols-2 lg:gap-16 lg:px-8">
       <div class="pan-stage mx-auto w-full max-w-xl">
-        <svg viewBox="0 0 600 440" class="w-full overflow-visible" role="img" aria-label="平底鍋上的鍋貼正被一顆顆翻煎，冒著熱氣與油花">
+        <div id="pan3d" class="relative aspect-[600/440] w-full" role="img" aria-label="3D 動畫：平底鍋上的鍋貼正被一顆顆翻煎，冒著熱氣與油花">
+        <div class="sizzle-bubble doodle-box absolute left-0 top-[6%] z-10 rounded-2xl bg-cream-50 px-4 py-2 font-serif text-xl font-bold text-ember-500 shadow-soft sm:text-2xl" aria-hidden="true">滋滋～</div>
+        <svg viewBox="0 0 600 440" class="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
           <!-- 爐火 -->
           <g>
             <path class="flame" style="--d:0s" d="M210 432 C196 410 206 392 218 380 C222 398 234 404 232 420 C230 428 222 434 210 432Z" fill="#7DB9F7" stroke="#1E2A44" stroke-width="3.5" stroke-linejoin="round"/>
@@ -527,6 +531,7 @@ tailwind.config = {
             <text x="115" y="140" text-anchor="middle" font-family="'LXGW WenKai TC','Huninn',sans-serif" font-size="28" font-weight="700" fill="#E8457F">滋滋～</text>
           </g>
         </svg>
+        </div>
       </div>
       <div class="reveal">
         <p class="kicker k-pink inline-flex items-center gap-2"><span class="live-dot inline-block h-2.5 w-2.5 rounded-full bg-tomato ring-2 ring-wood-800"></span>LIVE・現煎中</p>
@@ -1828,6 +1833,287 @@ tailwind.config = {
   observeReveals();
   refreshIcons();
 })();
+</script>
+<script type="module">
+/* =========================================================
+   3D 現煎中動畫（Three.js）— 失敗時保留原本 2D SVG 動畫
+========================================================= */
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
+
+const host = document.getElementById('pan3d');
+if (host) {
+  try { initPan3D(host); } catch (err) { console.warn('3D 動畫無法啟動，改用 2D 版本', err); }
+}
+
+function initPan3D(host) {
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  if (!renderer.getContext()) return;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.domElement.className = 'absolute inset-0 h-full w-full';
+  renderer.domElement.setAttribute('aria-hidden', 'true');
+  host.appendChild(renderer.domElement);
+  host.classList.add('is-3d');
+
+  const INK = 0x1E2A44;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 600 / 440, 0.1, 100);
+  camera.position.set(0, 5.4, 11.2);
+  camera.lookAt(0, 0.55, 0);
+
+  /* 卡通三階光影 */
+  const grad = new THREE.DataTexture(new Uint8Array([110, 190, 255]), 3, 1, THREE.RedFormat);
+  grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.needsUpdate = true;
+  const toon = (color, extra = {}) => new THREE.MeshToonMaterial({ color, gradientMap: grad, ...extra });
+  const inkHull = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
+
+  scene.add(new THREE.HemisphereLight(0xFFF8E6, 0x8A93AB, 1.6));
+  const sun = new THREE.DirectionalLight(0xFFFFFF, 2.2); sun.position.set(-3, 8, 5); scene.add(sun);
+  const fireLight = new THREE.PointLight(0xFF8A3D, 6, 8, 1.6); fireLight.position.set(0, -1.1, 0); scene.add(fireLight);
+  const warm = new THREE.PointLight(0xFFD23F, 3, 7, 1.5); warm.position.set(0, 2.2, 0.5); scene.add(warm);
+
+  const world = new THREE.Group(); scene.add(world);
+
+  /* ---------- 平底鍋 ---------- */
+  const pan = new THREE.Group(); world.add(pan);
+  const profile = [
+    [0, 0], [2.45, 0], [2.7, 0.08], [2.92, 0.42], [3.0, 0.56], [3.1, 0.54], [3.04, 0.42], [2.78, 0.0], [2.62, -0.1], [0, -0.1]
+  ].map(([x, y]) => new THREE.Vector2(x, y));
+  const panBody = new THREE.Mesh(new THREE.LatheGeometry(profile, 72), toon(0x2B3554, { side: THREE.DoubleSide }));
+  pan.add(panBody);
+  const ring = (r, tube, y, color = INK) => { const m = new THREE.Mesh(new THREE.TorusGeometry(r, tube, 8, 96), new THREE.MeshBasicMaterial({ color })); m.rotation.x = Math.PI / 2; m.position.y = y; pan.add(m); return m; };
+  ring(3.06, 0.06, 0.55);
+  ring(2.68, 0.05, -0.08);
+  ring(2.46, 0.035, 0.01, 0x141C30);
+
+  /* 冰花脆皮（畫在畫布上的蕾絲紋理） */
+  const laceCanvas = document.createElement('canvas'); laceCanvas.width = laceCanvas.height = 512;
+  const lc = laceCanvas.getContext('2d');
+  lc.fillStyle = '#3B4668'; lc.fillRect(0, 0, 512, 512);
+  const lg = lc.createRadialGradient(256, 256, 40, 256, 256, 240);
+  lg.addColorStop(0, '#F7C56A'); lg.addColorStop(0.75, '#EBA548'); lg.addColorStop(1, 'rgba(235,165,72,0)');
+  lc.fillStyle = lg; lc.beginPath(); lc.arc(256, 256, 240, 0, Math.PI * 2); lc.fill();
+  lc.fillStyle = 'rgba(196,106,18,.55)';
+  for (let i = 0; i < 260; i++) {
+    const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * 220;
+    lc.beginPath(); lc.arc(256 + Math.cos(a) * r, 256 + Math.sin(a) * r, 2 + Math.random() * 5, 0, Math.PI * 2); lc.fill();
+  }
+  const laceTex = new THREE.CanvasTexture(laceCanvas); laceTex.colorSpace = THREE.SRGBColorSpace;
+  const lace = new THREE.Mesh(new THREE.CircleGeometry(2.45, 72), toon(0xFFFFFF, { map: laceTex }));
+  lace.rotation.x = -Math.PI / 2; lace.position.y = 0.012; pan.add(lace);
+
+  /* 鍋柄 */
+  const handle = new THREE.Group(); handle.position.set(3.0, 0.42, 0); handle.rotation.z = 0.18; pan.add(handle);
+  const hGeo = new THREE.CylinderGeometry(0.15, 0.13, 2.6, 20); hGeo.rotateZ(Math.PI / 2); hGeo.translate(1.3, 0, 0);
+  handle.add(new THREE.Mesh(hGeo, toon(0x1E2A44)));
+  const hl = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.6, 8).rotateZ(Math.PI / 2).translate(1.6, 0.12, 0.08), new THREE.MeshBasicMaterial({ color: 0x4E5875 }));
+  handle.add(hl);
+
+  /* ---------- 爐火 ---------- */
+  const burner = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.12, 10, 48), toon(0x4E5875));
+  burner.rotation.x = Math.PI / 2; burner.position.y = -0.95; world.add(burner);
+  const flames = [];
+  const flameColors = [0x7DB9F7, 0xFF8A3D, 0xFFB23F];
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const f = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.62, 12).translate(0, 0.31, 0), new THREE.MeshBasicMaterial({ color: flameColors[i % 3] }));
+    f.position.set(Math.cos(a) * 1.6, -0.9, Math.sin(a) * 1.6);
+    world.add(f); flames.push({ m: f, seed: Math.random() * 10 });
+  }
+
+  /* ---------- 鍋貼 ---------- */
+  const S = 0.78, BODY_H = 0.46, BOTTOM_H = 0.06;
+  function makeDumplingGeometry() {
+    const g = new THREE.SphereGeometry(1, 48, 28);
+    const p = g.attributes.position, colors = [];
+    const cTop = new THREE.Color(0xFFF1D2), cEdge = new THREE.Color(0xF2C77E), cCrust = new THREE.Color(0xD9822B), cDark = new THREE.Color(0xA85A16), c = new THREE.Color();
+    for (let i = 0; i < p.count; i++) {
+      let x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+      x *= 0.8; z *= 0.38;
+      if (y >= 0) { c.copy(cTop).lerp(cEdge, Math.pow(1 - y, 4)); y *= BODY_H; }
+      else { const n = Math.sin(x * 23) * Math.cos(z * 31) > 0.35; c.copy(n ? cDark : cCrust); y *= BOTTOM_H; }
+      z += 0.2 * Math.pow(x / 0.8, 2) - 0.08;
+      p.setXYZ(i, x, y, z); colors.push(c.r, c.g, c.b);
+    }
+    g.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    g.computeVertexNormals();
+    return g;
+  }
+  const dGeo = makeDumplingGeometry();
+  const dMat = toon(0xFFFFFF, { vertexColors: true });
+  const pleatGeo = new THREE.SphereGeometry(1, 12, 8);
+  const pleatMat = toon(0xF4DDB0);
+  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x141C30, transparent: true, opacity: 0.35, depthWrite: false });
+  const shadowGeo = new THREE.CircleGeometry(0.7, 32); shadowGeo.rotateX(-Math.PI / 2);
+
+  const SPOTS = [[-1.35, -0.75, 0.25], [0, -1.0, -0.1], [1.35, -0.75, -0.3], [-0.75, 0.75, 0.15], [0.75, 0.75, -0.2]];
+  const CYCLE = 3.5, FLIP = 0.95, JUMP = 1.7;
+  const dumplings = SPOTS.map(([x, z, ry], i) => {
+    const holder = new THREE.Group(); holder.position.set(x, 0, z); holder.rotation.y = ry; world.add(holder);
+    const flipper = new THREE.Group(); holder.add(flipper);
+    const body = new THREE.Group(); flipper.add(body);
+    body.add(new THREE.Mesh(dGeo, dMat));
+    const hull = new THREE.Mesh(dGeo, inkHull); hull.scale.set(1.045, 1.12, 1.12); body.add(hull);
+    for (let k = -2; k <= 2; k++) {
+      const px = k * 0.19, crestY = BODY_H * Math.sqrt(Math.max(0, 1 - Math.pow(px / 0.8, 2)));
+      const pl = new THREE.Mesh(pleatGeo, pleatMat);
+      pl.scale.set(0.055, 0.05, 0.14); pl.position.set(px, crestY - 0.015, 0.2 * Math.pow(px / 0.8, 2) - 0.08); pl.rotation.y = k * 0.12;
+      body.add(pl);
+      const plInk = new THREE.Mesh(pleatGeo, inkHull); plInk.scale.set(0.07, 0.065, 0.155); plInk.position.copy(pl.position); plInk.rotation.copy(pl.rotation); body.add(plInk);
+    }
+    body.scale.setScalar(S);
+    const shadow = new THREE.Mesh(shadowGeo, shadowMat.clone()); shadow.position.y = 0.02; holder.add(shadow);
+    return { holder, flipper, body, shadow, phase: (i * CYCLE) / SPOTS.length + (i % 2) * 0.2 };
+  });
+
+  /* ---------- 鍋鏟 ---------- */
+  const spatula = new THREE.Group(); world.add(spatula);
+  const blade = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.05, 0.7), toon(0xE2E6F0)); spatula.add(blade);
+  const bladeInk = new THREE.Mesh(blade.geometry, inkHull); bladeInk.scale.set(1.08, 1.8, 1.1); spatula.add(bladeInk);
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.2, 10).rotateZ(Math.PI / 2 - 0.5).translate(1.4, 0.6, 0), toon(0xE8B56A));
+  spatula.add(shaft);
+  const shaftInk = new THREE.Mesh(shaft.geometry, inkHull); shaftInk.scale.setScalar(1.04); spatula.add(shaftInk);
+  spatula.position.set(1.8, 0.5, 0.6);
+
+  /* ---------- 熱氣 ---------- */
+  const steamCanvas = document.createElement('canvas'); steamCanvas.width = steamCanvas.height = 128;
+  const sc = steamCanvas.getContext('2d');
+  const sg = sc.createRadialGradient(64, 64, 4, 64, 64, 62);
+  sg.addColorStop(0, 'rgba(255,255,255,1)'); sg.addColorStop(0.6, 'rgba(255,255,255,.85)'); sg.addColorStop(0.8, 'rgba(170,180,205,.55)'); sg.addColorStop(1, 'rgba(170,180,205,0)');
+  sc.fillStyle = sg; sc.fillRect(0, 0, 128, 128);
+  const steamTex = new THREE.CanvasTexture(steamCanvas);
+  const steam = [];
+  for (let i = 0; i < 22; i++) {
+    const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: steamTex, transparent: true, depthWrite: false, opacity: 0 }));
+    world.add(m);
+    steam.push({ m, life: 2.4 + Math.random() * 1.4, t: Math.random() * 3.5, x: 0, z: 0, sway: Math.random() * 6 });
+  }
+  const respawnSteam = s => { const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * 1.9; s.x = Math.cos(a) * r; s.z = Math.sin(a) * r * 0.8; s.t = 0; };
+  steam.forEach(s => { const t = s.t; respawnSteam(s); s.t = t; });
+
+  /* ---------- 油花 ---------- */
+  const oilMat = new THREE.MeshBasicMaterial({ color: 0xFFE49A });
+  const oilGeo = new THREE.SphereGeometry(0.06, 8, 6);
+  const oils = [];
+  for (let i = 0; i < 18; i++) {
+    const m = new THREE.Mesh(oilGeo, oilMat); m.visible = false; world.add(m);
+    oils.push({ m, t: Math.random(), life: 0.5 + Math.random() * 0.4, x: 0, z: 0, vx: 0, vz: 0, h: 0 });
+  }
+  const respawnOil = o => {
+    const a = Math.random() * Math.PI * 2, r = 0.4 + Math.random() * 1.9;
+    o.x = Math.cos(a) * r; o.z = Math.sin(a) * r * 0.85; o.vx = (Math.random() - 0.5) * 0.8; o.vz = (Math.random() - 0.5) * 0.8;
+    o.h = 0.4 + Math.random() * 0.6; o.t = 0; o.life = 0.45 + Math.random() * 0.4;
+  };
+  oils.forEach(respawnOil);
+
+  /* ---------- 互動與尺寸 ---------- */
+  let pointerX = 0, pointerY = 0;
+  host.addEventListener('pointermove', e => {
+    const r = host.getBoundingClientRect();
+    pointerX = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    pointerY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+  });
+  host.addEventListener('pointerleave', () => { pointerX = pointerY = 0; });
+
+  const resize = () => {
+    const w = host.clientWidth, h = host.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+  };
+  new ResizeObserver(resize).observe(host); resize();
+
+  /* ---------- 動畫迴圈 ---------- */
+  const ease = u => u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+  const clock = new THREE.Clock();
+  let time = 0, spTarget = new THREE.Vector3(1.8, 0.5, 0.6), spLift = 0, spTilt = 0;
+
+  function frame() {
+    const dt = Math.min(clock.getDelta(), 0.05);
+    time += dt;
+
+    // 整體視角輕微擺動 + 滑鼠視差
+    world.rotation.y += ((Math.sin(time * 0.45) * 0.22 + pointerX * 0.35) - world.rotation.y) * Math.min(1, dt * 3);
+    world.rotation.x += ((pointerY * 0.08) - world.rotation.x) * Math.min(1, dt * 3);
+    pan.position.x = Math.sin(time * 7.5) * 0.025;
+
+    // 鍋貼翻面
+    let flippingOne = null, nextOne = null, nextT = -1;
+    dumplings.forEach(d => {
+      const total = time + d.phase, k = Math.floor(total / CYCLE), t = total - k * CYCLE;
+      let rot, jump = 0, squash = 0;
+      if (t < FLIP) {
+        const u = t / FLIP;
+        rot = Math.PI * k + Math.PI * ease(u);
+        jump = JUMP * Math.sin(Math.PI * u);
+        flippingOne = { d, u };
+      } else {
+        rot = Math.PI * (k + 1);
+        const lt = t - FLIP;
+        if (lt < 0.28) squash = Math.sin(Math.PI * lt / 0.28) * 0.2;
+        if (t > nextT) { nextT = t; nextOne = { d, u: undefined }; }
+      }
+      const base = (0.26 - 0.2 * Math.cos(rot)) * S;
+      d.flipper.position.y = base + jump;
+      d.flipper.rotation.x = rot;
+      d.flipper.rotation.z = Math.sin(time * 11 + d.phase * 3) * 0.025;
+      d.body.scale.set(S * (1 + squash * 0.5), S * (1 - squash), S * (1 + squash * 0.5));
+      const air = Math.min(1, jump / JUMP);
+      d.shadow.scale.setScalar(1 - air * 0.55);
+      d.shadow.material.opacity = 0.35 - air * 0.25;
+    });
+
+    // 鍋鏟跟著準備翻面的鍋貼
+    const active = flippingOne || nextOne;
+    if (active) {
+      const p = active.d.holder.position;
+      const flipping = active.u !== undefined;
+      spTarget.set(p.x + 0.6, 0.28, p.z + 0.4);
+      spLift = flipping ? Math.sin(Math.PI * Math.min(1, active.u * 1.6)) * 0.9 : 0;
+      spTilt = flipping ? -Math.sin(Math.PI * Math.min(1, active.u * 1.6)) * 0.7 : Math.sin(time * 6) * 0.05;
+    }
+    const f = Math.min(1, dt * 7);
+    spatula.position.x += (spTarget.x - spatula.position.x) * f;
+    spatula.position.z += (spTarget.z - spatula.position.z) * f;
+    spatula.position.y += (spTarget.y + spLift - spatula.position.y) * Math.min(1, dt * 12);
+    spatula.rotation.z += (spTilt - spatula.rotation.z) * Math.min(1, dt * 12);
+    spatula.rotation.y = -0.5;
+
+    // 火焰閃動與爐火光
+    flames.forEach(fl => { const n = Math.sin(time * 17 + fl.seed) * 0.5 + Math.sin(time * 29 + fl.seed * 2) * 0.5; fl.m.scale.set(1 - n * 0.08, 0.85 + n * 0.3, 1 - n * 0.08); });
+    fireLight.intensity = 5.5 + Math.sin(time * 19) * 1.2 + Math.sin(time * 31) * 0.8;
+
+    // 熱氣
+    steam.forEach(s => {
+      s.t += dt;
+      if (s.t > s.life) respawnSteam(s);
+      const u = s.t / s.life;
+      s.m.position.set(s.x + Math.sin(time * 1.6 + s.sway) * 0.25 * u, 0.9 + u * 3.0, s.z);
+      const sz = 0.45 + u * 1.2; s.m.scale.set(sz, sz, 1);
+      s.m.material.opacity = Math.sin(Math.PI * u) * 0.5;
+    });
+
+    // 油花彈跳
+    oils.forEach(o => {
+      o.t += dt;
+      if (o.t > o.life) respawnOil(o);
+      const u = o.t / o.life;
+      o.m.visible = true;
+      o.m.position.set(o.x + o.vx * u, 0.05 + 4 * o.h * u * (1 - u), o.z + o.vz * u);
+      o.m.scale.setScalar(1 - u * 0.6);
+    });
+
+    renderer.render(scene, camera);
+  }
+
+  // 只在畫面上看得到時才播放，省電
+  let running = false;
+  const setRunning = on => { if (on === running) return; running = on; if (on) clock.getDelta(); renderer.setAnimationLoop(on ? frame : null); };
+  new IntersectionObserver(es => es.forEach(e => setRunning(e.isIntersecting)), { rootMargin: '100px' }).observe(host);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) setRunning(false); else { const r = host.getBoundingClientRect(); setRunning(r.bottom > 0 && r.top < innerHeight); } });
+  frame();
+  window.__pan3dTime = () => time;
+}
 </script>
 </body>
 </html>
