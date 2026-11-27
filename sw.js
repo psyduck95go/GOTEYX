@@ -2,7 +2,7 @@
    - 網頁本身：網路優先（有新版就拿新版，離線時用快取）
    - 圖片、字型、CDN 程式庫：先用快取、背景更新
    更新網站內容後，請把 VERSION 改掉，讓舊快取被清除。 */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = `goteyx-${VERSION}`;
 const SHELL = [
   './',
