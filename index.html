@@ -819,11 +819,17 @@ tailwind.config = {
 ========================================================= -->
 <div id="toastWrap" class="pointer-events-none fixed inset-x-0 bottom-5 z-[80] flex flex-col items-center gap-2 px-4 sm:bottom-auto sm:left-auto sm:right-5 sm:top-24 sm:items-end" aria-live="polite"></div>
 
-<!-- 手機版浮動購物車 -->
-<button id="fabCart" type="button" class="btn-doodle fixed bottom-5 right-5 z-30 hidden items-center gap-2 rounded-full bg-sun py-3 pl-4 pr-5 text-wood-900 sm:hidden" aria-label="查看購物車">
-  <i data-lucide="shopping-bag" class="h-5 w-5"></i>
-  <span id="fabText" class="text-sm font-bold"></span>
-</button>
+<!-- 右下角浮動按鈕：預約＋手機版購物車 -->
+<div class="fixed bottom-5 right-5 z-30 flex flex-col items-end gap-3">
+  <a id="fabBooking" href="https://calendar.app.google/UCwJYXbU6d1R5aCK8" target="_blank" rel="noopener" class="btn-doodle inline-flex items-center gap-2 rounded-full bg-ember-500 py-3 pl-4 pr-5 text-white" aria-label="線上預約（另開新視窗）">
+    <i data-lucide="calendar-check" class="h-5 w-5"></i>
+    <span class="text-sm font-bold">線上預約</span>
+  </a>
+  <button id="fabCart" type="button" class="btn-doodle hidden items-center gap-2 rounded-full bg-sun py-3 pl-4 pr-5 text-wood-900 sm:hidden" aria-label="查看購物車">
+    <i data-lucide="shopping-bag" class="h-5 w-5"></i>
+    <span id="fabText" class="text-sm font-bold"></span>
+  </button>
+</div>
 
 <!-- =========================================================
      JAVASCRIPT
