@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="紅油抄手">
+<defs>
+  <g id="wt">
+    <path d="M-62 10 C-80 -4 -60 -30 -40 -22 C-36 -46 -4 -52 8 -34 C26 -52 60 -38 52 -14 C78 -12 80 18 56 24 C40 44 -40 44 -62 10Z" fill="#FFF4E4" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="-4" cy="-2" rx="26" ry="16" fill="#F7D9C4" stroke="#1E2A44" stroke-width="4"/>
+    <path d="M-40 18 q16 8 30 4 M14 22 q14 2 26 -8" fill="none" stroke="#1E2A44" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M-30 -18 q10 -6 20 -2" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</defs>
+<rect width="800" height="600" fill="#FFE3EF"/>
+<g opacity=".4" stroke-linecap="round" stroke-width="6" fill="none"><path d="M60 70l18 8" stroke="#E8322B"/><path d="M730 90l8 18" stroke="#FFD23F"/><path d="M70 530l16-6" stroke="#3CC48A"/><path d="M720 540l-14 10" stroke="#E8322B"/></g>
+<!-- 碗 -->
+<path d="M120 270 C130 470 250 540 400 540 C550 540 670 470 680 270Z" fill="#1E2A44"/>
+<path d="M112 262 C122 462 242 532 392 532 C542 532 662 462 672 262Z" fill="#FFFFFF" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+<path d="M170 400 q40 20 80 0 t80 0 t80 0 t80 0 t80 0" fill="none" stroke="#7DB9F7" stroke-width="6" stroke-linecap="round"/>
+<path d="M190 450 l12 12 l12 -12 M370 474 l12 12 l12 -12 M550 450 l12 12 l12 -12" fill="none" stroke="#7DB9F7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="392" cy="262" rx="280" ry="84" fill="#FFFFFF" stroke="#1E2A44" stroke-width="5"/>
+<!-- 紅油 -->
+<ellipse cx="392" cy="266" rx="252" ry="68" fill="#C8231C"/>
+<ellipse cx="392" cy="262" rx="238" ry="60" fill="#E8322B"/>
+<g fill="#F7593A" opacity=".9"><ellipse cx="250" cy="282" rx="34" ry="10"/><ellipse cx="560" cy="250" rx="28" ry="8"/><ellipse cx="420" cy="300" rx="40" ry="9"/></g>
+<!-- 抄手 -->
+<use href="#wt" transform="translate(290 240) rotate(-8) scale(.95)"/>
+<use href="#wt" transform="translate(470 230) rotate(10) scale(.95)"/>
+<use href="#wt" transform="translate(380 280)"/>
+<use href="#wt" transform="translate(560 286) rotate(-4) scale(.85)"/>
+<use href="#wt" transform="translate(210 286) rotate(6) scale(.8)"/>
+<!-- 辣椒碎 -->
+<g fill="#9E1410"><circle cx="330" cy="300" r="4"/><circle cx="452" cy="268" r="4"/><circle cx="520" cy="300" r="3.5"/><circle cx="250" cy="250" r="3.5"/><circle cx="610" cy="262" r="3"/><circle cx="400" cy="232" r="3"/><circle cx="350" cy="250" r="3"/></g>
+<!-- 花生碎 -->
+<g fill="#E7B070" stroke="#1E2A44" stroke-width="2.5"><path d="M300 210 l12 -4 l4 10 l-12 4Z"/><path d="M420 214 l10 -6 l6 10 l-10 6Z"/><path d="M500 280 l12 -2 l2 10 l-12 2Z"/><path d="M380 312 l10 -6 l6 10 l-10 6Z"/><path d="M560 248 l10 -4 l4 10 l-10 4Z"/><path d="M240 296 l10 -4 l4 10 l-10 4Z"/></g>
+<!-- 蒜泥 -->
+<g fill="#FFF8DD" stroke="#1E2A44" stroke-width="2"><circle cx="340" cy="226" r="5"/><circle cx="352" cy="232" r="4"/><circle cx="446" cy="300" r="5"/><circle cx="458" cy="306" r="4"/><circle cx="530" cy="228" r="4.5"/></g>
+<!-- 蔥花 -->
+<g fill="#3CC48A" stroke="#1E2A44" stroke-width="2.5"><circle cx="270" cy="222" r="7"/><circle cx="398" cy="244" r="7"/><circle cx="478" cy="256" r="6"/><circle cx="600" cy="300" r="6"/><circle cx="320" cy="324" r="6"/><circle cx="520" cy="210" r="6"/></g>
+<g fill="#B7EFCF"><circle cx="270" cy="222" r="3"/><circle cx="398" cy="244" r="3"/><circle cx="478" cy="256" r="2.5"/><circle cx="600" cy="300" r="2.5"/><circle cx="320" cy="324" r="2.5"/><circle cx="520" cy="210" r="2.5"/></g>
+<!-- 熱氣 -->
+<path d="M330 150 q-14 -24 4 -48 t4 -48 M400 140 q-14 -24 4 -48 t4 -48 M470 150 q-14 -24 4 -48 t4 -48" fill="none" stroke="#FF8FC4" stroke-width="6" stroke-linecap="round" opacity=".8"/>
+<!-- 辣椒 -->
+<g transform="translate(700 150) rotate(30)"><path d="M0 -60 C30 -40 30 30 -10 70 C0 20 -14 -20 -20 -50Z" fill="#E8322B" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/><path d="M-12 -56 q4 -20 18 -24" fill="none" stroke="#3CC48A" stroke-width="8" stroke-linecap="round"/><path d="M4 -30 q10 20 4 50" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".7"/></g>
+<!-- 湯匙 -->
+<g transform="translate(110 150) rotate(-30)" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"><ellipse rx="46" ry="30" fill="#FFFFFF"/><path d="M40 -8 L150 -14 L150 6 L40 10Z" fill="#FFFFFF"/><ellipse rx="30" ry="16" fill="#E8322B" stroke-width="0"/></g>
+</svg>

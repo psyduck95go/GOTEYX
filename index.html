@@ -840,7 +840,7 @@ tailwind.config = {
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const money = n => 'NT$' + Number(n).toLocaleString('zh-TW');
   const refreshIcons = () => { if (window.lucide) lucide.createIcons(); };
-  const IMG = id => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=75`;
+  const IMG = id => id.startsWith('photo-') ? `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=75` : id;
   const escapeHTML = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   /* 圖片載入失敗時的手繪風替代圖 */
@@ -865,10 +865,10 @@ tailwind.config = {
     { id: 'p3', cat: 'potsticker', name: '麻辣牛肉鍋貼', desc: '澳洲牛肋條手剁，拌入自炒花椒辣油，香麻過癮。', price: 130, tags: ['爆汁'], spicy: 3, img: 'photo-1625938145744-e380515399b7' },
     { id: 'p4', cat: 'potsticker', name: '起司玉米鍋貼', desc: '牽絲莫札瑞拉起司包覆甜玉米，大人小孩都愛。', price: 100, tags: ['新品'], spicy: 0, img: 'photo-1534422298391-e4f8c172dddb' },
     // 精選水餃
-    { id: 'd1', cat: 'dumpling', name: '高麗菜豬肉水餃', desc: '經典家常口味，皮Q餡多，一口一顆剛剛好。', price: 70, tags: ['人氣'], spicy: 0, img: 'photo-1563245372-f21724e3856d' },
-    { id: 'd2', cat: 'dumpling', name: '鮮蝦干貝水餃', desc: '北海道干貝與鮮蝦，海味滿滿的奢華選擇。', price: 150, tags: ['主廚推薦'], spicy: 0, img: 'photo-1609501676725-7186f017a4b7' },
-    { id: 'd3', cat: 'dumpling', name: '紅油抄手', desc: '薄皮餛飩淋上川味紅油、蒜泥與花生碎。', price: 90, tags: ['爆汁'], spicy: 2, img: 'photo-1583032015879-e5022cb87c3b' },
-    { id: 'd4', cat: 'dumpling', name: '香菇素食水餃', desc: '香菇、豆干、青江菜與冬粉，蛋奶素可食。', price: 75, tags: ['素食'], spicy: 0, img: 'photo-1576577445504-6af96477db52' },
+    { id: 'd1', cat: 'dumpling', name: '高麗菜豬肉水餃', desc: '經典家常口味，皮Q餡多，一口一顆剛剛好。', price: 70, tags: ['人氣'], spicy: 0, img: 'images/dumplings/d1-cabbage-pork.svg' },
+    { id: 'd2', cat: 'dumpling', name: '鮮蝦干貝水餃', desc: '北海道干貝與鮮蝦，海味滿滿的奢華選擇。', price: 150, tags: ['主廚推薦'], spicy: 0, img: 'images/dumplings/d2-shrimp-scallop.svg' },
+    { id: 'd3', cat: 'dumpling', name: '紅油抄手', desc: '薄皮餛飩淋上川味紅油、蒜泥與花生碎。', price: 90, tags: ['爆汁'], spicy: 2, img: 'images/dumplings/d3-chili-oil-wonton.svg' },
+    { id: 'd4', cat: 'dumpling', name: '香菇素食水餃', desc: '香菇、豆干、青江菜與冬粉，蛋奶素可食。', price: 75, tags: ['素食'], spicy: 0, img: 'images/dumplings/d4-shiitake-veg.svg' },
     // 湯品 / 飲料
     { id: 's1', cat: 'drink', name: '酸辣湯', desc: '豆腐、木耳、筍絲與蛋花，酸香開胃，鍋貼最佳拍檔。', price: 45, tags: ['人氣'], spicy: 1, img: 'photo-1547592166-23ac45744acd' },
     { id: 's2', cat: 'drink', name: '玉米濃湯', desc: '甜玉米粒與滑蛋慢熬，溫潤濃郁。', price: 45, tags: [], spicy: 0, img: 'photo-1476718406336-bb5a9690ee2a' },

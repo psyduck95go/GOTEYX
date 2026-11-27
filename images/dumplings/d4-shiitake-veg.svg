@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="香菇素食水餃">
+<defs>
+  <g id="dp">
+    <path d="M-78 18 C-80 -48 80 -48 78 18 C44 40 -44 40 -78 18Z" fill="#E6F6D9" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M-50 -16 q8 10 2 22 M-22 -28 q8 12 2 26 M8 -30 q8 12 2 26 M36 -22 q8 10 2 22" fill="none" stroke="#1E2A44" stroke-width="4" stroke-linecap="round"/>
+    <path d="M-58 14 q20 10 40 10" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <g id="mush">
+    <path d="M-16 0 L-20 56 C-20 66 20 66 20 56 L16 0Z" fill="#FFF1DC" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M-74 6 C-74 -60 74 -60 74 6 C40 22 -40 22 -74 6Z" fill="#8B5A3C" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M-26 -28 L26 -2 M26 -28 L-26 -2" stroke="#F3DDC0" stroke-width="7" stroke-linecap="round"/>
+    <g fill="#F3DDC0"><circle cx="-50" cy="-10" r="4"/><circle cx="46" cy="-14" r="4"/><circle cx="0" cy="-40" r="3.5"/></g>
+  </g>
+</defs>
+<rect width="800" height="600" fill="#E3F7EC"/>
+<g opacity=".45" stroke-linecap="round" stroke-width="6" fill="none"><path d="M60 70l18 8" stroke="#3CC48A"/><path d="M730 520l8 18" stroke="#FFD23F"/><path d="M70 530l16-6" stroke="#FF8FC4"/></g>
+<!-- 盤子 -->
+<ellipse cx="400" cy="340" rx="320" ry="196" fill="#1E2A44"/>
+<ellipse cx="394" cy="330" rx="316" ry="192" fill="#FFFFFF" stroke="#1E2A44" stroke-width="5"/>
+<ellipse cx="394" cy="330" rx="256" ry="148" fill="none" stroke="#3CC48A" stroke-width="5" stroke-dasharray="14 12"/>
+<!-- 青江菜 -->
+<g transform="translate(200 300) rotate(-24)">
+  <path d="M0 80 C-50 40 -60 -60 -10 -110 C10 -60 14 20 0 80Z" fill="#3CC48A" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M0 80 C40 30 60 -60 20 -110 C0 -60 -6 20 0 80Z" fill="#5FD69F" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M-12 90 C-14 40 -6 0 0 -20 C6 0 14 40 12 90Z" fill="#DFF5C8" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+</g>
+<use href="#dp" transform="translate(360 240) rotate(-6)"/>
+<use href="#dp" transform="translate(530 250) rotate(6)"/>
+<use href="#dp" transform="translate(330 370)"/>
+<!-- 切開的水餃：香菇、豆干、青菜、冬粉 -->
+<g transform="translate(510 380) rotate(4)">
+  <path d="M-78 18 C-80 -48 80 -48 78 18 C44 40 -44 40 -78 18Z" fill="#E6F6D9" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M-58 12 C-56 -28 56 -28 58 12 C30 26 -30 26 -58 12Z" fill="#F6E7C8" stroke="#1E2A44" stroke-width="4"/>
+  <path d="M-46 4 q20 -16 40 0 t40 -4 M-40 12 q24 -12 50 2 t30 -6" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+  <g fill="#8B5A3C"><rect x="-38" y="-10" width="12" height="10" rx="3"/><rect x="10" y="-16" width="12" height="10" rx="3"/><rect x="30" y="0" width="10" height="9" rx="3"/></g>
+  <g fill="#C7925A"><rect x="-14" y="-4" width="12" height="12" rx="2"/><rect x="-46" y="4" width="10" height="9" rx="2"/></g>
+  <g fill="#3CC48A"><circle cx="0" cy="-16" r="5"/><circle cx="22" cy="6" r="5"/><circle cx="-24" cy="-16" r="4"/></g>
+</g>
+<!-- 香菇 -->
+<use href="#mush" transform="translate(640 160) rotate(12) scale(.9)"/>
+<use href="#mush" transform="translate(140 130) rotate(-14) scale(.7)"/>
+<!-- 豆干丁 -->
+<g stroke="#1E2A44" stroke-width="4" stroke-linejoin="round">
+  <g transform="translate(620 480)"><path d="M0 0 h40 v34 h-40Z" fill="#B57E48"/><path d="M0 0 l14 -12 h40 l-14 12Z" fill="#D9A56C"/><path d="M40 0 l14 -12 v34 l-14 12Z" fill="#9C6838"/></g>
+  <g transform="translate(680 450) scale(.8)"><path d="M0 0 h40 v34 h-40Z" fill="#B57E48"/><path d="M0 0 l14 -12 h40 l-14 12Z" fill="#D9A56C"/><path d="M40 0 l14 -12 v34 l-14 12Z" fill="#9C6838"/></g>
+</g>
+<!-- 素食葉子徽章 -->
+<g transform="translate(110 500)"><circle r="44" fill="#3CC48A" stroke="#1E2A44" stroke-width="5"/><path d="M-18 18 C-20 -14 4 -26 24 -22 C26 2 10 24 -18 18Z" fill="#FFFFFF" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/><path d="M-18 18 L12 -10" stroke="#1E2A44" stroke-width="4" stroke-linecap="round"/></g>
+</svg>

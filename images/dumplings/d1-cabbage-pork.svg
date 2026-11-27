@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="高麗菜豬肉水餃">
+<defs>
+  <g id="dp">
+    <path d="M-78 18 C-80 -48 80 -48 78 18 C44 40 -44 40 -78 18Z" fill="#FFFBEF" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M-50 -16 q8 10 2 22 M-22 -28 q8 12 2 26 M8 -30 q8 12 2 26 M36 -22 q8 10 2 22" fill="none" stroke="#1E2A44" stroke-width="4" stroke-linecap="round"/>
+    <path d="M-58 14 q20 10 40 10" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".9"/>
+  </g>
+</defs>
+<rect width="800" height="600" fill="#FFF3D1"/>
+<g opacity=".35" stroke-linecap="round" stroke-width="6" fill="none"><path d="M60 70l18 8" stroke="#FF8FC4"/><path d="M720 90l8 18" stroke="#7DB9F7"/><path d="M80 520l16-6" stroke="#3CC48A"/><path d="M700 530l-14 10" stroke="#FFD23F"/></g>
+<!-- 高麗菜葉 -->
+<g transform="translate(150 300) rotate(-18)">
+  <path d="M0 -120 C80 -130 130 -60 120 10 C110 80 50 120 -10 110 C-90 100 -120 30 -110 -40 C-100 -100 -60 -118 0 -120Z" fill="#B9E58C" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M-80 70 C-30 10 10 -40 60 -100 M-20 0 l-50 -40 M10 -40 l50 10 M-40 30 l40 40" fill="none" stroke="#7BBF4E" stroke-width="5" stroke-linecap="round"/>
+</g>
+<!-- 盤子 -->
+<ellipse cx="420" cy="330" rx="310" ry="200" fill="#1E2A44"/>
+<ellipse cx="414" cy="320" rx="306" ry="196" fill="#FFFFFF" stroke="#1E2A44" stroke-width="5"/>
+<ellipse cx="414" cy="320" rx="250" ry="152" fill="none" stroke="#7DB9F7" stroke-width="5" stroke-dasharray="14 12"/>
+<use href="#dp" transform="translate(320 240) rotate(-8)"/>
+<use href="#dp" transform="translate(500 230) rotate(6)"/>
+<use href="#dp" transform="translate(270 360) rotate(-4)"/>
+<use href="#dp" transform="translate(450 350)"/>
+<!-- 切開的水餃，露出豬肉高麗菜餡 -->
+<g transform="translate(600 370) rotate(8)">
+  <path d="M-78 18 C-80 -48 80 -48 78 18 C44 40 -44 40 -78 18Z" fill="#FFFBEF" stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M-58 12 C-56 -28 56 -28 58 12 C30 26 -30 26 -58 12Z" fill="#F2A6A0" stroke="#1E2A44" stroke-width="4"/>
+  <g fill="#6DBE45"><circle cx="-30" cy="0" r="6"/><circle cx="-4" cy="-10" r="5"/><circle cx="22" cy="2" r="6"/><circle cx="38" cy="-6" r="4"/><circle cx="6" cy="10" r="4"/></g>
+  <g fill="#D9786F"><circle cx="-14" cy="6" r="4"/><circle cx="14" cy="-14" r="4"/><circle cx="-40" cy="10" r="3"/></g>
+  <path d="M-10 -36 q-4 -18 6 -30 M14 -38 q6 -16 -2 -30" fill="none" stroke="#8A93AB" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+</g>
+<!-- 醬油碟 -->
+<g transform="translate(660 150)">
+  <ellipse rx="70" ry="42" fill="#FFFFFF" stroke="#1E2A44" stroke-width="5"/>
+  <ellipse rx="50" ry="28" fill="#6B3A22"/>
+  <path d="M-24 -10 q14 -6 26 0" fill="none" stroke="#B8704A" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="18" cy="6" r="4" fill="#E8322B"/><circle cx="-12" cy="8" r="3" fill="#FFF3D1"/>
+</g>
+<!-- 筷子 -->
+<g stroke="#1E2A44" stroke-width="5" stroke-linejoin="round"><path d="M110 520 L420 470 L424 482 L114 534Z" fill="#E8B56A"/><path d="M130 550 L440 490 L444 502 L134 562Z" fill="#E8B56A"/></g>
+</svg>
