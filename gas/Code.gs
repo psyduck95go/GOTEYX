@@ -10,6 +10,14 @@
  *   5. 把產生的網址（…/exec）貼到網站 index.html 的 ORDER_API
  */
 
+/**
+ * 試算表 ID：
+ * - 從試算表「擴充功能 → Apps Script」建立的程式（綁定型）可以留空。
+ * - 如果程式是在 script.google.com 另外建立的，請填入試算表網址中
+ *   /d/ 與 /edit 之間那一串 ID。
+ */
+const SPREADSHEET_ID = '';
+
 const SHEET = { ORDERS: '訂單', ITEMS: '訂單明細', PRODUCTS: '商品', SETTINGS: '設定' };
 const STATUSES = ['新訂單', '製作中', '可取餐', '已出貨', '已完成', '已取消'];
 const STATUS_COLORS = { '新訂單': '#FFE3EF', '製作中': '#FFF3D1', '可取餐': '#DFF7EA', '已出貨': '#E2F0FF', '已完成': '#EEEEEE', '已取消': '#F4CCCC' };
@@ -34,6 +42,34 @@ const DEFAULT_SETTINGS = [
   ['接受訂單', '是', '填「否」可暫停線上訂單（例如公休）']
 ];
 
+/** 取得訂單試算表（綁定型或填了 SPREADSHEET_ID 都可以） */
+function ss_() {
+  const id = SPREADSHEET_ID || PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+  const ss = id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActive();
+  if (!ss) throw new Error('找不到訂單試算表：請從試算表的「擴充功能 → Apps Script」建立程式，或在 Code.gs 填入 SPREADSHEET_ID');
+  return ss;
+}
+
+/** 依名稱找工作表（容忍名稱前後多打的空白） */
+function sheet_(ss, name) {
+  return ss.getSheetByName(name) || ss.getSheets().find(sh => sh.getName().trim() === name) || null;
+}
+
+/** 確保 4 個工作表、標題列、商品與設定資料都在；缺什麼補什麼，不會動到既有訂單 */
+function ensureStructure_(ss) {
+  const orders = ensureSheet_(ss, SHEET.ORDERS, ORDER_HEADERS);
+  ensureSheet_(ss, SHEET.ITEMS, ITEM_HEADERS);
+  const products = ensureSheet_(ss, SHEET.PRODUCTS, ['品項代碼', '品名', '單價', '上架']);
+  const settings = ensureSheet_(ss, SHEET.SETTINGS, ['項目', '值', '說明']);
+  if (products.getLastRow() < 2) {
+    products.getRange(2, 1, DEFAULT_PRODUCTS.length, 4).setValues(DEFAULT_PRODUCTS.map(r => r.concat('是')));
+  }
+  const have = settings.getLastRow() > 1 ? settings.getRange(2, 1, settings.getLastRow() - 1, 1).getValues().map(r => String(r[0]).trim()) : [];
+  const missing = DEFAULT_SETTINGS.filter(r => have.indexOf(r[0]) === -1);
+  if (missing.length) settings.getRange(settings.getLastRow() + 1, 1, missing.length, 3).setValues(missing);
+  return orders;
+}
+
 /* ============================================================
    試算表選單
 ============================================================ */
@@ -46,18 +82,8 @@ function onOpen() {
 
 /** 建立工作表、標題列、狀態下拉選單與顏色。重複執行不會清掉既有資料。 */
 function setup() {
-  const ss = SpreadsheetApp.getActive();
-  const orders = ensureSheet_(ss, SHEET.ORDERS, ORDER_HEADERS);
-  ensureSheet_(ss, SHEET.ITEMS, ITEM_HEADERS);
-  const products = ensureSheet_(ss, SHEET.PRODUCTS, ['品項代碼', '品名', '單價', '上架']);
-  const settings = ensureSheet_(ss, SHEET.SETTINGS, ['項目', '值', '說明']);
-
-  if (products.getLastRow() < 2) {
-    products.getRange(2, 1, DEFAULT_PRODUCTS.length, 4).setValues(DEFAULT_PRODUCTS.map(r => r.concat('是')));
-  }
-  if (settings.getLastRow() < 2) {
-    settings.getRange(2, 1, DEFAULT_SETTINGS.length, 3).setValues(DEFAULT_SETTINGS);
-  }
+  const ss = ss_();
+  const orders = ensureStructure_(ss);
 
   // 狀態欄：下拉選單 + 依狀態上色
   const statusCol = ORDER_HEADERS.indexOf('狀態') + 1;
@@ -72,14 +98,17 @@ function setup() {
   orders.getRange('J:J').setNumberFormat('@');
 
   const first = ss.getSheets()[0];
-  if (first.getName() !== SHEET.ORDERS && first.getLastRow() === 0) ss.deleteSheet(first);  // 刪掉預設空白「工作表1」
-  SpreadsheetApp.getActive().toast('工作表已準備完成，接著請部署為網頁應用程式。', '狠餃色訂單', 8);
+  if (Object.values(SHEET).indexOf(first.getName().trim()) === -1 && first.getLastRow() === 0 && ss.getSheets().length > 1) ss.deleteSheet(first);  // 刪掉預設空白「工作表1」
+  try { ss.toast('工作表已準備完成，接著請部署為網頁應用程式。', '狠餃色訂單', 8); } catch (e) {}
 }
 
 function ensureSheet_(ss, name, headers) {
-  const sh = ss.getSheetByName(name) || ss.insertSheet(name);
-  sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold').setBackground('#FFD23F');
-  sh.setFrozenRows(1);
+  const sh = sheet_(ss, name) || ss.insertSheet(name);
+  const current = sh.getRange(1, 1, 1, headers.length).getValues()[0].map(v => String(v).trim());
+  if (current.join('|') !== headers.join('|')) {
+    sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold').setBackground('#FFD23F');
+    sh.setFrozenRows(1);
+  }
   return sh;
 }
 
@@ -101,7 +130,7 @@ function doPost(e) {
 function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.action === 'status') {
-    const sh = SpreadsheetApp.getActive().getSheetByName(SHEET.ORDERS);
+    const sh = sheet_(ss_(), SHEET.ORDERS);
     const rows = sh.getDataRange().getValues();
     const no = String(p.no || '').trim(), tail = String(p.phone || '').replace(/\D/g, '').slice(-3);
     for (let i = rows.length - 1; i > 0; i--) {
@@ -111,7 +140,24 @@ function doGet(e) {
     }
     return json_({ ok: false, error: '查無此訂單' });
   }
-  return json_({ ok: true, service: '狠餃色訂單 API', time: new Date().toISOString() });
+  if (p.action === 'check') return json_(diagnose_());
+  return json_({ ok: true, service: '狠餃色訂單 API', version: 2, time: new Date().toISOString() });
+}
+
+/** ?action=check：檢查試算表是否找得到、工作表與商品是否齊全，並自動補齊 */
+function diagnose_() {
+  const report = { ok: true, version: 2, problems: [] };
+  let ss;
+  try { ss = ss_(); } catch (err) { return { ok: false, version: 2, problems: [err.message] }; }
+  report.spreadsheet = ss.getName();
+  report.sheetsBefore = ss.getSheets().map(sh => sh.getName());
+  try { ensureStructure_(ss); } catch (err) { report.ok = false; report.problems.push('補齊工作表失敗：' + err.message); }
+  report.sheetsAfter = ss.getSheets().map(sh => sh.getName());
+  try { report.products = Object.keys(readProducts_()).length; } catch (err) { report.ok = false; report.problems.push('讀取商品失敗：' + err.message); }
+  const orders = sheet_(ss, SHEET.ORDERS);
+  report.orders = orders ? Math.max(0, orders.getLastRow() - 1) : 0;
+  if (!report.products) { report.ok = false; report.problems.push('「商品」工作表沒有可販售的商品'); }
+  return report;
 }
 
 function json_(obj) {
@@ -122,6 +168,7 @@ function json_(obj) {
    建立訂單
 ============================================================ */
 function createOrder_(d) {
+  readProducts_();   // 順便確保工作表結構完整
   const settings = readSettings_();
   if (settings['接受訂單'] === '否') throw new Error('目前暫停線上訂單，請改電話或現場點餐。');
 
@@ -157,9 +204,10 @@ function createOrder_(d) {
   try {
     now = new Date();
     orderNo = nextOrderNo_(settings['訂單編號前綴'] || 'CV', now);
-    const ss = SpreadsheetApp.getActive();
+    const ss = ss_();
+    ensureStructure_(ss);
     const summary = lines.map(l => `${l.name}×${l.qty}`).join('、');
-    ss.getSheetByName(SHEET.ORDERS).appendRow([
+    sheet_(ss, SHEET.ORDERS).appendRow([
       orderNo, now, '新訂單', MODE_LABEL[mode],
       mode === 'delivery' ? '' : clean_(d.storeName, 40),
       mode === 'delivery' ? '' : clean_(d.time, 40),
@@ -168,7 +216,7 @@ function createOrder_(d) {
       name, "'" + phone, email, clean_(d.pay, 20), clean_(d.note, 300), summary,
       subtotal, shipping, total, clean_(d.source, 20) || 'web'
     ]);
-    const itemSheet = ss.getSheetByName(SHEET.ITEMS);
+    const itemSheet = sheet_(ss, SHEET.ITEMS);
     const itemRows = lines.map(l => [orderNo, now, l.id, l.name, l.price, l.qty, l.sub]);
     itemSheet.getRange(itemSheet.getLastRow() + 1, 1, itemRows.length, ITEM_HEADERS.length).setValues(itemRows);
     SpreadsheetApp.flush();
@@ -199,7 +247,9 @@ function nextOrderNo_(prefix, now) {
 }
 
 function readProducts_() {
-  const rows = SpreadsheetApp.getActive().getSheetByName(SHEET.PRODUCTS).getDataRange().getValues().slice(1);
+  const ss = ss_();
+  ensureStructure_(ss);
+  const rows = sheet_(ss, SHEET.PRODUCTS).getDataRange().getValues().slice(1);
   const map = {};
   rows.forEach(([id, name, price, on]) => {
     if (id && String(on).trim() !== '否' && Number(price) > 0) map[String(id).trim()] = { name: String(name), price: Number(price) };
@@ -208,7 +258,7 @@ function readProducts_() {
 }
 
 function readSettings_() {
-  const sh = SpreadsheetApp.getActive().getSheetByName(SHEET.SETTINGS);
+  const sh = sheet_(ss_(), SHEET.SETTINGS);
   const out = {};
   if (sh) sh.getDataRange().getValues().slice(1).forEach(([k, v]) => { if (k) out[String(k).trim()] = typeof v === 'string' ? v.trim() : v; });
   return out;
@@ -245,7 +295,7 @@ function notifyStore_(o, settings) {
   MailApp.sendEmail({
     to,
     subject: `🥟 新訂單 ${o.orderNo}｜${MODE_LABEL[o.mode]}｜NT$${o.total}`,
-    body: `${orderText_(o)}\n\n顧客：${o.name}（${o.phone}${o.email ? '，' + o.email : ''}）\n\n試算表：${SpreadsheetApp.getActive().getUrl()}`
+    body: `${orderText_(o)}\n\n顧客：${o.name}（${o.phone}${o.email ? '，' + o.email : ''}）\n\n試算表：${ss_().getUrl()}`
   });
 }
 
@@ -266,7 +316,7 @@ function notifyCustomer_(o) {
 function showTodaySummary() {
   const tz = Session.getScriptTimeZone() || 'Asia/Taipei';
   const today = Utilities.formatDate(new Date(), tz, 'yyyy/MM/dd');
-  const rows = SpreadsheetApp.getActive().getSheetByName(SHEET.ORDERS).getDataRange().getValues().slice(1)
+  const rows = sheet_(ss_(), SHEET.ORDERS).getDataRange().getValues().slice(1)
     .filter(r => r[1] instanceof Date && Utilities.formatDate(r[1], tz, 'yyyy/MM/dd') === today && r[2] !== '已取消');
   const total = rows.reduce((s, r) => s + Number(r[16] || 0), 0);
   const byMode = {};
