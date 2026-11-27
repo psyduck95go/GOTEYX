@@ -99,6 +99,8 @@ tailwind.config = {
   }
   .scribble-pink { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='16' viewBox='0 0 120 16'%3E%3Cpath d='M2 10 Q 12 2 22 9 T 42 9 T 62 9 T 82 9 T 102 9 T 118 8' fill='none' stroke='%23FF8FC4' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E"); }
   /* 商品卡片：交錯微傾斜 */
+  .paper-menu { background-image: repeating-linear-gradient(transparent 0 35px, rgba(125,185,247,.18) 35px 36px); }
+  .menu-leader { flex: 1; min-width: 1.5rem; border-bottom: 2.5px dotted #8A93AB; transform: translateY(-6px); }
   #menuGrid article:nth-child(odd) { transform: rotate(-.8deg); }
   #menuGrid article:nth-child(even) { transform: rotate(.8deg); }
   #menuGrid article:hover { transform: rotate(0) translateY(-4px); box-shadow: 6px 8px 0 0 var(--ink); }
@@ -412,13 +414,37 @@ tailwind.config = {
         </p>
       </div>
 
-      <!-- 分類 Tabs -->
-      <div class="no-scrollbar -mx-4 mt-10 overflow-x-auto px-4 py-1">
-        <div id="menuTabs" role="tablist" aria-label="菜單分類" class="doodle-box inline-flex min-w-max gap-2 rounded-full bg-cream-50 p-1.5"></div>
+      <!-- 檢視方式切換：圖片 / 列表 -->
+      <div class="mt-10 flex justify-end">
+        <div id="menuViewToggle" role="group" aria-label="點餐檢視方式" class="doodle-box inline-flex gap-1 rounded-full bg-cream-50 p-1.5">
+          <button type="button" data-view="card" class="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition"><i data-lucide="layout-grid" class="h-4 w-4"></i>圖片點餐</button>
+          <button type="button" data-view="list" class="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition"><i data-lucide="list" class="h-4 w-4"></i>列表點餐</button>
+        </div>
       </div>
 
-      <!-- 產品格 -->
-      <div id="menuGrid" class="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" role="tabpanel" aria-live="polite"></div>
+      <!-- 圖片點餐 -->
+      <div id="menuCardView">
+        <!-- 分類 Tabs -->
+        <div class="no-scrollbar -mx-4 mt-6 overflow-x-auto px-4 py-1">
+          <div id="menuTabs" role="tablist" aria-label="菜單分類" class="doodle-box inline-flex min-w-max gap-2 rounded-full bg-cream-50 p-1.5"></div>
+        </div>
+        <!-- 產品格 -->
+        <div id="menuGrid" class="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" role="tabpanel" aria-live="polite"></div>
+      </div>
+
+      <!-- 列表點餐（手寫菜單風） -->
+      <div id="menuListView" class="hidden">
+        <div class="doodle-box paper-menu relative mt-6 rounded-[2rem] bg-cream-50 p-5 shadow-soft sm:p-8 lg:p-10">
+          <span class="tape -top-3 left-1/2 -translate-x-1/2 rotate-[-3deg]" aria-hidden="true"></span>
+          <p class="text-center font-serif text-2xl font-bold text-wood-900 sm:text-3xl">～ 今日菜單 ～</p>
+          <p class="mt-1 text-center text-sm text-wood-500">直接按 ＋／－ 調整數量，會同步加入購物車</p>
+          <div id="menuList" class="mt-8 grid gap-x-12 gap-y-10 lg:grid-cols-2"></div>
+          <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t-[2.5px] border-dashed border-wood-800 pt-6 sm:flex-row">
+            <p class="text-wood-700">已選 <span id="menuListQty" class="font-bold text-wood-900">0</span> 件・小計 <span id="menuListSub" class="font-serif text-2xl font-bold text-ember-600">NT$0</span></p>
+            <button type="button" id="menuListCheckout" class="btn-doodle inline-flex items-center gap-2 rounded-full bg-ember-500 px-6 py-3 font-bold text-white"><i data-lucide="shopping-bag" class="h-5 w-5"></i>查看購物車・結帳</button>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1042,6 +1068,68 @@ tailwind.config = {
     renderTabs(); renderMenu();
   });
 
+  /* ---------- 列表點餐（一次看全部品項，直接 +1 / -1） ---------- */
+  function renderMenuList() {
+    const box = $('#menuList');
+    if (!box) return;
+    box.innerHTML = CATEGORIES.map(c => `
+      <section class="min-w-0">
+        <h3 class="flex items-center gap-2 font-serif text-xl font-bold text-wood-900">
+          <span class="grid h-9 w-9 place-items-center rounded-full border-[2.5px] border-wood-800 bg-sun"><i data-lucide="${c.icon}" class="h-4 w-4"></i></span>
+          <span class="scribble">${c.name}</span>
+        </h3>
+        <ul class="mt-4 divide-y-2 divide-dashed divide-wood-100">
+          ${PRODUCTS.filter(p => p.cat === c.id).map(p => {
+            const q = cart[p.id] || 0;
+            return `
+          <li class="flex items-center gap-3 py-3">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-end gap-2">
+                <span class="whitespace-nowrap font-bold text-wood-900">${p.name}</span>
+                ${p.spicy ? `<span class="whitespace-nowrap text-xs" title="辣度 ${p.spicy}/3">${'🌶'.repeat(p.spicy)}</span>` : ''}
+                <span class="menu-leader" aria-hidden="true"></span>
+                <span class="font-serif text-lg font-bold text-ember-600">${p.price}</span>
+              </div>
+              <p class="mt-0.5 truncate text-xs text-wood-500">${p.tags.map(t => `<span class="mr-1 rounded-full border border-wood-800 px-1.5 text-[10px] font-bold ${tagStyle(t)}">${t}</span>`).join('')}${p.desc}</p>
+            </div>
+            <div class="flex shrink-0 items-center gap-1 rounded-full border-[2.5px] border-wood-800 ${q ? 'bg-sun' : 'bg-white'} p-0.5">
+              <button type="button" data-list-dec="${p.id}" class="grid h-8 w-8 place-items-center rounded-full transition hover:bg-cream-200 disabled:opacity-30" ${q ? '' : 'disabled'} aria-label="${p.name} 減一"><i data-lucide="minus" class="h-4 w-4"></i></button>
+              <span class="w-6 text-center font-bold text-wood-900">${q}</span>
+              <button type="button" data-list-inc="${p.id}" class="grid h-8 w-8 place-items-center rounded-full bg-wood-800 text-cream-50 transition hover:bg-ember-500" aria-label="${p.name} 加一"><i data-lucide="plus" class="h-4 w-4"></i></button>
+            </div>
+          </li>`; }).join('')}
+        </ul>
+      </section>`).join('');
+    const qty = PRODUCTS.reduce((n, p) => n + (cart[p.id] || 0), 0);
+    const sub = PRODUCTS.reduce((n, p) => n + (cart[p.id] || 0) * p.price, 0);
+    $('#menuListQty').textContent = qty;
+    $('#menuListSub').textContent = money(sub);
+    refreshIcons();
+  }
+  $('#menuList').addEventListener('click', e => {
+    const inc = e.target.closest('[data-list-inc]'), dec = e.target.closest('[data-list-dec]');
+    if (inc) { const id = inc.dataset.listInc; setQty(id, (cart[id] || 0) + 1); bumpBadge(); }
+    else if (dec) { const id = dec.dataset.listDec; setQty(id, (cart[id] || 0) - 1); }
+  });
+  $('#menuListCheckout').addEventListener('click', () => openCart());
+
+  const VIEW_KEY = 'menuView';
+  function setMenuView(v) {
+    $('#menuCardView').classList.toggle('hidden', v !== 'card');
+    $('#menuListView').classList.toggle('hidden', v !== 'list');
+    $$('#menuViewToggle [data-view]').forEach(b => {
+      const on = b.dataset.view === v;
+      b.setAttribute('aria-pressed', on);
+      ['bg-sun', 'text-wood-900', 'ring-[2.5px]', 'ring-wood-800'].forEach(c => b.classList.toggle(c, on));
+      b.classList.toggle('text-wood-500', !on);
+    });
+    try { localStorage.setItem(VIEW_KEY, v); } catch (e) {}
+  }
+  $('#menuViewToggle').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) setMenuView(b.dataset.view); });
+  let savedView = 'card';
+  try { if (localStorage.getItem(VIEW_KEY) === 'list') savedView = 'list'; } catch (e) {}
+  setMenuView(savedView);
+
   /* ---------- 禮盒 ---------- */
   const GIFT_TILT = ['-rotate-1', 'md:-translate-y-4', 'rotate-1'];
   function renderGifts() {
@@ -1092,6 +1180,7 @@ tailwind.config = {
     b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
   }
   function renderCart() {
+    renderMenuList();
     const qty = cartQty(), sub = cartSubtotal(), lines = cartLines();
     const badge = $('#cartBadge');
     badge.textContent = qty > 99 ? '99+' : qty;
