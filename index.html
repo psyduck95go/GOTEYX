@@ -260,71 +260,9 @@ tailwind.config = {
         </div>
       </div>
 
-      <!-- 原創手繪：小惡魔餃子 -->
+      <!-- 主視覺海報 -->
       <div class="relative mx-auto w-full max-w-lg">
-        <svg viewBox="0 0 520 480" class="w-full" role="img" aria-label="戴著小惡魔角、壞笑的可愛餃子插畫">
-          <!-- 地面影子 -->
-          <ellipse cx="260" cy="410" rx="190" ry="22" fill="#1E2A44" opacity=".08"/>
-          <!-- 彩色碎片 -->
-          <g stroke-linecap="round" stroke-width="8" fill="none" filter="url(#rough)">
-            <path d="M60 110l22 10" stroke="#FF8FC4"/><path d="M455 95l8 22" stroke="#7DB9F7"/>
-            <path d="M40 300l18-8" stroke="#3CC48A"/><path d="M480 300l-6 20" stroke="#E8322B"/>
-            <path d="M150 60l16 4" stroke="#FFD23F"/><path d="M390 440l20-4" stroke="#FF8FC4"/>
-            <path d="M95 430l10-14" stroke="#7DB9F7"/>
-          </g>
-          <!-- 披風（綠底黃點） -->
-          <g filter="url(#rough)">
-            <path d="M370 240 C445 215 500 290 482 392 C455 372 430 382 405 352 C392 320 380 280 370 240Z" fill="#3CC48A"/>
-            <circle cx="430" cy="280" r="9" fill="#FFD23F"/><circle cx="462" cy="330" r="8" fill="#FFD23F"/><circle cx="425" cy="335" r="7" fill="#FFD23F"/><circle cx="455" cy="372" r="6" fill="#FFD23F"/>
-          </g>
-          <!-- 三叉戟 -->
-          <g stroke="#1E2A44" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
-            <path d="M75 395 L75 150"/>
-            <path d="M52 150 C52 175 98 175 98 150 M75 150 L75 118 M52 150 L48 125 M98 150 L102 125"/>
-            <path d="M128 300 C110 290 95 280 78 262"/>
-          </g>
-          <!-- 惡魔角 -->
-          <g filter="url(#rough)">
-            <path d="M198 190 C186 160 190 135 208 118 C212 145 222 162 236 178Z" fill="#E8322B"/>
-            <path d="M322 190 C334 160 330 135 312 118 C308 145 298 162 284 178Z" fill="#E8322B"/>
-          </g>
-          <!-- 餃子本體 -->
-          <g filter="url(#rough)">
-            <path d="M105 335 C100 235 175 170 260 170 C345 170 420 235 415 335 C360 368 160 368 105 335Z" fill="#FFD23F"/>
-            <!-- 煎得酥脆的底 -->
-            <path d="M108 330 C165 360 355 360 412 330 C410 352 380 372 260 374 C140 372 110 352 108 330Z" fill="#C8742F"/>
-          </g>
-          <!-- 摺痕 -->
-          <g stroke="#9A5326" stroke-width="5" stroke-linecap="round" fill="none">
-            <path d="M175 205 q8 14 4 30"/><path d="M215 186 q8 15 4 32"/><path d="M260 180 q6 16 2 32"/><path d="M305 186 q-2 16 -8 32"/><path d="M345 205 q-4 14 -10 30"/>
-          </g>
-          <!-- 酥脆冰花點點 -->
-          <g stroke="#7A3E1A" stroke-width="4" stroke-linecap="round"><path d="M150 352l10 3"/><path d="M220 362l12 1"/><path d="M300 362l12-1"/><path d="M365 352l10-3"/></g>
-          <!-- 臉：壞壞眉毛 -->
-          <g stroke="#1E2A44" stroke-width="8" stroke-linecap="round" fill="none">
-            <path d="M200 250 L238 264"/><path d="M320 250 L282 264"/>
-          </g>
-          <circle cx="228" cy="282" r="10" fill="#1E2A44"/><circle cx="292" cy="282" r="10" fill="#1E2A44"/>
-          <circle cx="231" cy="278" r="3" fill="#fff"/><circle cx="295" cy="278" r="3" fill="#fff"/>
-          <!-- 壞笑 + 小虎牙 -->
-          <path d="M238 310 C254 324 278 322 294 304" fill="none" stroke="#1E2A44" stroke-width="6" stroke-linecap="round"/>
-          <path d="M268 318 l5 11 l5 -12z" fill="#fff" stroke="#1E2A44" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- 腮紅 -->
-          <ellipse cx="192" cy="306" rx="18" ry="10" fill="#FF8FC4"/><ellipse cx="328" cy="306" rx="18" ry="10" fill="#FF8FC4"/>
-          <!-- 小腳 -->
-          <g stroke="#1E2A44" stroke-width="7" stroke-linecap="round" fill="none"><path d="M205 372 q-6 18 -22 22"/><path d="M315 372 q6 18 22 22"/></g>
-          <!-- 醬油小跟班 -->
-          <g class="wiggle" style="transform-box: fill-box">
-            <path d="M440 395 C440 380 452 362 460 350 C468 362 480 380 480 395 a20 20 0 0 1 -40 0z" fill="#7DB9F7" stroke="#1E2A44" stroke-width="3.5" filter="url(#rough)"/>
-            <circle cx="452" cy="394" r="3.5" fill="#1E2A44"/><circle cx="468" cy="394" r="3.5" fill="#1E2A44"/>
-            <path d="M455 403 q5 4 10 0" fill="none" stroke="#1E2A44" stroke-width="2.5" stroke-linecap="round"/>
-          </g>
-          <!-- 對話框 -->
-          <g transform="rotate(-6 150 80)">
-            <path d="M95 50 h120 a16 16 0 0 1 16 16 v32 a16 16 0 0 1 -16 16 h-62 l-18 20 l2 -20 h-42 a16 16 0 0 1 -16 -16 v-32 a16 16 0 0 1 16 -16z" fill="#FFFDF8" stroke="#1E2A44" stroke-width="3.5" stroke-linejoin="round"/>
-            <text x="155" y="92" text-anchor="middle" font-family="'LXGW WenKai TC','Huninn',sans-serif" font-size="22" font-weight="700" fill="#1E2A44">嘿嘿～好吃！</text>
-          </g>
-        </svg>
+        <img src="https://i.postimg.cc/j2YmMLV1/Chat-GPT-Image-2026nian8yue9ri-xia-wu06-20-57.png" alt="可愛反派狠餃色 主視覺海報" class="doodle-box h-auto w-full rounded-3xl bg-cream-50 shadow-soft" fetchpriority="high" data-fallback />
       </div>
     </div>
 
