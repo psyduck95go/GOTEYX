@@ -150,6 +150,41 @@ tailwind.config = {
   .bump { animation: bump .4s ease; }
   /* 數量輸入隱藏箭頭 */
   input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  /* ---------- 現煎中動畫 ---------- */
+  .pan-stage .pt { transform-box: fill-box; transform-origin: 50% 50%; animation: ptFlip 4s cubic-bezier(.45,0,.3,1) infinite; animation-delay: var(--d, 0s); }
+  .pan-stage .pt .face-top { animation: faceTop 4s steps(1, end) infinite; animation-delay: var(--d, 0s); }
+  .pan-stage .pt .face-crust { opacity: 0; animation: faceCrust 4s steps(1, end) infinite; animation-delay: var(--d, 0s); }
+  .pan-stage .pt-shadow { transform-box: fill-box; transform-origin: 50% 50%; animation: ptShadow 4s cubic-bezier(.45,0,.3,1) infinite; animation-delay: var(--d, 0s); }
+  @keyframes ptFlip {
+    0%, 66% { transform: translateY(0) scaleY(1); }
+    72% { transform: translateY(-70px) scaleY(.05); }
+    78% { transform: translateY(-96px) scaleY(-1); }
+    84% { transform: translateY(-70px) scaleY(-.05); }
+    90% { transform: translateY(0) scaleY(1); }
+    93% { transform: translateY(0) scale(1.08, .86); }
+    96%, 100% { transform: translateY(0) scale(1, 1); }
+  }
+  @keyframes faceTop { 0% { opacity: 1; } 72% { opacity: 0; } 84% { opacity: 1; } }
+  @keyframes faceCrust { 0% { opacity: 0; } 72% { opacity: 1; } 84% { opacity: 0; } }
+  @keyframes ptShadow { 0%, 66% { transform: scale(1); opacity: .22; } 78% { transform: scale(.45); opacity: .08; } 90%, 100% { transform: scale(1); opacity: .22; } }
+  .pan-stage .steam { animation: steamUp 2.8s ease-in-out infinite; animation-delay: var(--d, 0s); opacity: 0; }
+  @keyframes steamUp { 0% { transform: translateY(16px); opacity: 0; } 30% { opacity: .95; } 100% { transform: translateY(-46px); opacity: 0; } }
+  .pan-stage .pop { transform-box: fill-box; transform-origin: 50% 50%; animation: popOil 1.6s ease-out infinite; animation-delay: var(--d, 0s); opacity: 0; }
+  @keyframes popOil { 0%, 55% { transform: scale(0); opacity: 0; } 65% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(.4) translateY(-14px); opacity: 0; } }
+  .pan-stage .flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker .5s ease-in-out infinite alternate; animation-delay: var(--d, 0s); }
+  @keyframes flicker { from { transform: scaleY(.82) scaleX(1.05); } to { transform: scaleY(1.12) scaleX(.95); } }
+  .pan-stage .spatula { transform-box: fill-box; transform-origin: 90% 90%; animation: spatula .8s ease-in-out infinite alternate; }
+  @keyframes spatula { from { transform: rotate(-6deg); } to { transform: rotate(8deg); } }
+  .pan-stage .pan-shake { animation: panShake .8s ease-in-out infinite; }
+  @keyframes panShake { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
+  .pan-stage .sizzle-word { transform-box: fill-box; transform-origin: 50% 100%; animation: sizzleWord 1.2s ease-in-out infinite; }
+  @keyframes sizzleWord { 0%, 100% { transform: rotate(-6deg) scale(1); } 50% { transform: rotate(-2deg) scale(1.1); } }
+  .live-dot { animation: liveDot 1s ease-in-out infinite; }
+  @keyframes liveDot { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+  @media (prefers-reduced-motion: reduce) {
+    .pan-stage *, .live-dot { animation: none !important; }
+    .pan-stage .steam { opacity: .8; }
+  }
   @media (prefers-reduced-motion: reduce) { .floaty, .wiggle, .map-pin, .map-ping { animation: none; } }
 </style>
 </head>
@@ -333,6 +368,159 @@ tailwind.config = {
     <a href="#story" class="absolute bottom-4 left-1/2 -translate-x-1/2 text-wood-800 animate-bounce" aria-label="往下滑動">
       <i data-lucide="chevrons-down" class="h-7 w-7"></i>
     </a>
+  </section>
+
+  <!-- =========================================================
+       LIVE：現煎中動畫
+  ========================================================= -->
+  <section aria-label="鍋貼現煎中" class="relative overflow-hidden border-y-[2.5px] border-wood-800 bg-sun py-16 md:py-20">
+    <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 md:grid-cols-2 lg:gap-16 lg:px-8">
+      <div class="pan-stage mx-auto w-full max-w-xl">
+        <svg viewBox="0 0 600 440" class="w-full overflow-visible" role="img" aria-label="平底鍋上的鍋貼正被一顆顆翻煎，冒著熱氣與油花">
+          <!-- 爐火 -->
+          <g>
+            <path class="flame" style="--d:0s" d="M210 432 C196 410 206 392 218 380 C222 398 234 404 232 420 C230 428 222 434 210 432Z" fill="#7DB9F7" stroke="#1E2A44" stroke-width="3.5" stroke-linejoin="round"/>
+            <path class="flame" style="--d:.15s" d="M262 434 C244 404 262 380 276 366 C280 390 296 400 292 420 C290 430 276 436 262 434Z" fill="#FF8A3D" stroke="#1E2A44" stroke-width="3.5" stroke-linejoin="round"/>
+            <path class="flame" style="--d:.3s" d="M322 434 C302 400 322 372 338 358 C342 386 360 398 354 420 C352 430 336 436 322 434Z" fill="#FFB23F" stroke="#1E2A44" stroke-width="3.5" stroke-linejoin="round"/>
+            <path class="flame" style="--d:.1s" d="M384 432 C370 408 382 390 394 378 C398 396 410 404 406 420 C404 428 396 434 384 432Z" fill="#7DB9F7" stroke="#1E2A44" stroke-width="3.5" stroke-linejoin="round"/>
+          </g>
+          <g class="pan-shake">
+            <!-- 鍋柄 -->
+            <path d="M510 276 L596 252 C604 250 610 262 602 268 L516 300Z" fill="#1E2A44" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M548 266 L590 255" stroke="#4E5875" stroke-width="5" stroke-linecap="round"/>
+            <!-- 鍋身 -->
+            <ellipse cx="305" cy="300" rx="232" ry="92" fill="#141C30"/>
+            <ellipse cx="300" cy="284" rx="230" ry="86" fill="#2B3554" stroke="#1E2A44" stroke-width="5"/>
+            <ellipse cx="300" cy="284" rx="206" ry="70" fill="#3B4668"/>
+            <!-- 冰花脆皮 -->
+            <ellipse cx="305" cy="285" rx="160" ry="50" fill="#F5C26B" opacity=".55"/>
+            <ellipse cx="305" cy="285" rx="160" ry="50" fill="none" stroke="#FFE49A" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round" opacity=".9"/>
+            <path d="M120 262 q50 -30 120 -34" fill="none" stroke="#8A93AB" stroke-width="6" stroke-linecap="round" opacity=".6"/>
+            
+          <g transform="translate(185 258) scale(1.3) translate(-185 -258)">
+          <ellipse class="pt-shadow" style="--d:0s" cx="185" cy="274" rx="38" ry="8" fill="#141C30"/>
+          <g class="pt" style="--d:0s">
+            <g class="face-top">
+              <path d="M143 264 C141 232 229 232 227 264 C209 276 161 276 143 264Z" fill="#FFF1D2" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M145 264 C161 275 209 275 225 264 L227 264 C209 276 161 276 143 264Z" fill="#E59A3A"/>
+              <path d="M159 248 q5 6 1 13 M175 243 q5 7 1 15 M191 243 q5 7 1 15 M207 247 q5 6 1 13" fill="none" stroke="#1E2A44" stroke-width="3" stroke-linecap="round"/>
+              <path d="M155 260 q12 6 24 6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <g class="face-crust">
+              <path d="M143 264 C141 232 229 232 227 264 C209 276 161 276 143 264Z" fill="#E8962E" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M155 260 C157 244 213 244 215 260 C201 268 169 268 155 260Z" fill="#C46A12"/>
+              <g fill="#FFD27A"><circle cx="167" cy="256" r="3"/><circle cx="185" cy="251" r="3.5"/><circle cx="201" cy="258" r="3"/><circle cx="179" cy="263" r="2.5"/><circle cx="211" cy="252" r="2"/></g>
+            </g>
+          </g>
+          </g>
+          <g transform="translate(305 252) scale(1.3) translate(-305 -252)">
+          <ellipse class="pt-shadow" style="--d:1.6s" cx="305" cy="268" rx="38" ry="8" fill="#141C30"/>
+          <g class="pt" style="--d:1.6s">
+            <g class="face-top">
+              <path d="M263 258 C261 226 349 226 347 258 C329 270 281 270 263 258Z" fill="#FFF1D2" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M265 258 C281 269 329 269 345 258 L347 258 C329 270 281 270 263 258Z" fill="#E59A3A"/>
+              <path d="M279 242 q5 6 1 13 M295 237 q5 7 1 15 M311 237 q5 7 1 15 M327 241 q5 6 1 13" fill="none" stroke="#1E2A44" stroke-width="3" stroke-linecap="round"/>
+              <path d="M275 254 q12 6 24 6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <g class="face-crust">
+              <path d="M263 258 C261 226 349 226 347 258 C329 270 281 270 263 258Z" fill="#E8962E" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M275 254 C277 238 333 238 335 254 C321 262 289 262 275 254Z" fill="#C46A12"/>
+              <g fill="#FFD27A"><circle cx="287" cy="250" r="3"/><circle cx="305" cy="245" r="3.5"/><circle cx="321" cy="252" r="3"/><circle cx="299" cy="257" r="2.5"/><circle cx="331" cy="246" r="2"/></g>
+            </g>
+          </g>
+          </g>
+          <g transform="translate(425 258) scale(1.3) translate(-425 -258)">
+          <ellipse class="pt-shadow" style="--d:3.2s" cx="425" cy="274" rx="38" ry="8" fill="#141C30"/>
+          <g class="pt" style="--d:3.2s">
+            <g class="face-top">
+              <path d="M383 264 C381 232 469 232 467 264 C449 276 401 276 383 264Z" fill="#FFF1D2" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M385 264 C401 275 449 275 465 264 L467 264 C449 276 401 276 383 264Z" fill="#E59A3A"/>
+              <path d="M399 248 q5 6 1 13 M415 243 q5 7 1 15 M431 243 q5 7 1 15 M447 247 q5 6 1 13" fill="none" stroke="#1E2A44" stroke-width="3" stroke-linecap="round"/>
+              <path d="M395 260 q12 6 24 6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <g class="face-crust">
+              <path d="M383 264 C381 232 469 232 467 264 C449 276 401 276 383 264Z" fill="#E8962E" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M395 260 C397 244 453 244 455 260 C441 268 409 268 395 260Z" fill="#C46A12"/>
+              <g fill="#FFD27A"><circle cx="407" cy="256" r="3"/><circle cx="425" cy="251" r="3.5"/><circle cx="441" cy="258" r="3"/><circle cx="419" cy="263" r="2.5"/><circle cx="451" cy="252" r="2"/></g>
+            </g>
+          </g>
+          </g>
+          <g transform="translate(245 310) scale(1.3) translate(-245 -310)">
+          <ellipse class="pt-shadow" style="--d:0.8s" cx="245" cy="326" rx="38" ry="8" fill="#141C30"/>
+          <g class="pt" style="--d:0.8s">
+            <g class="face-top">
+              <path d="M203 316 C201 284 289 284 287 316 C269 328 221 328 203 316Z" fill="#FFF1D2" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M205 316 C221 327 269 327 285 316 L287 316 C269 328 221 328 203 316Z" fill="#E59A3A"/>
+              <path d="M219 300 q5 6 1 13 M235 295 q5 7 1 15 M251 295 q5 7 1 15 M267 299 q5 6 1 13" fill="none" stroke="#1E2A44" stroke-width="3" stroke-linecap="round"/>
+              <path d="M215 312 q12 6 24 6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <g class="face-crust">
+              <path d="M203 316 C201 284 289 284 287 316 C269 328 221 328 203 316Z" fill="#E8962E" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M215 312 C217 296 273 296 275 312 C261 320 229 320 215 312Z" fill="#C46A12"/>
+              <g fill="#FFD27A"><circle cx="227" cy="308" r="3"/><circle cx="245" cy="303" r="3.5"/><circle cx="261" cy="310" r="3"/><circle cx="239" cy="315" r="2.5"/><circle cx="271" cy="304" r="2"/></g>
+            </g>
+          </g>
+          </g>
+          <g transform="translate(365 310) scale(1.3) translate(-365 -310)">
+          <ellipse class="pt-shadow" style="--d:2.4s" cx="365" cy="326" rx="38" ry="8" fill="#141C30"/>
+          <g class="pt" style="--d:2.4s">
+            <g class="face-top">
+              <path d="M323 316 C321 284 409 284 407 316 C389 328 341 328 323 316Z" fill="#FFF1D2" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M325 316 C341 327 389 327 405 316 L407 316 C389 328 341 328 323 316Z" fill="#E59A3A"/>
+              <path d="M339 300 q5 6 1 13 M355 295 q5 7 1 15 M371 295 q5 7 1 15 M387 299 q5 6 1 13" fill="none" stroke="#1E2A44" stroke-width="3" stroke-linecap="round"/>
+              <path d="M335 312 q12 6 24 6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <g class="face-crust">
+              <path d="M323 316 C321 284 409 284 407 316 C389 328 341 328 323 316Z" fill="#E8962E" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M335 312 C337 296 393 296 395 312 C381 320 349 320 335 312Z" fill="#C46A12"/>
+              <g fill="#FFD27A"><circle cx="347" cy="308" r="3"/><circle cx="365" cy="303" r="3.5"/><circle cx="381" cy="310" r="3"/><circle cx="359" cy="315" r="2.5"/><circle cx="391" cy="304" r="2"/></g>
+            </g>
+          </g>
+          </g>
+            <!-- 油花 -->
+            <g fill="#FFE49A" stroke="#1E2A44" stroke-width="2.5">
+              <circle class="pop" style="--d:0s" cx="150" cy="282" r="7"/>
+              <circle class="pop" style="--d:.4s" cx="460" cy="290" r="6"/>
+              <circle class="pop" style="--d:.8s" cx="300" cy="332" r="6"/>
+              <circle class="pop" style="--d:1.1s" cx="170" cy="318" r="5"/>
+              <circle class="pop" style="--d:.6s" cx="440" cy="250" r="5"/>
+              <circle class="pop" style="--d:1.3s" cx="250" cy="236" r="5"/>
+            </g>
+          </g>
+          <!-- 熱氣 -->
+          <g fill="none" stroke-linecap="round">
+            <g class="steam" style="--d:0s"><path d="M200 200 q-16 -22 0 -44 t0 -44" stroke="#1E2A44" stroke-width="12"/><path d="M200 200 q-16 -22 0 -44 t0 -44" stroke="#fff" stroke-width="6"/></g>
+            <g class="steam" style="--d:.9s"><path d="M300 190 q-16 -22 0 -44 t0 -44" stroke="#1E2A44" stroke-width="12"/><path d="M300 190 q-16 -22 0 -44 t0 -44" stroke="#fff" stroke-width="6"/></g>
+            <g class="steam" style="--d:1.8s"><path d="M400 200 q-16 -22 0 -44 t0 -44" stroke="#1E2A44" stroke-width="12"/><path d="M400 200 q-16 -22 0 -44 t0 -44" stroke="#fff" stroke-width="6"/></g>
+            <g class="steam" style="--d:1.3s"><path d="M250 214 q-12 -18 0 -36 t0 -36" stroke="#1E2A44" stroke-width="10"/><path d="M250 214 q-12 -18 0 -36 t0 -36" stroke="#FF8FC4" stroke-width="5"/></g>
+            <g class="steam" style="--d:.4s"><path d="M355 214 q-12 -18 0 -36 t0 -36" stroke="#1E2A44" stroke-width="10"/><path d="M355 214 q-12 -18 0 -36 t0 -36" stroke="#FF8FC4" stroke-width="5"/></g>
+          </g>
+          <!-- 鍋鏟 -->
+          <g class="spatula">
+            <path d="M470 150 L560 60" stroke="#1E2A44" stroke-width="14" stroke-linecap="round"/>
+            <path d="M470 150 L560 60" stroke="#E8B56A" stroke-width="7" stroke-linecap="round"/>
+            <path d="M432 170 L470 132 L494 156 L456 194Z" fill="#E2E6F0" stroke="#1E2A44" stroke-width="4.5" stroke-linejoin="round"/>
+            <path d="M452 160 l16 -16 M462 170 l16 -16" stroke="#8A93AB" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <!-- 滋滋字樣 -->
+          <g class="sizzle-word">
+            <path d="M40 92 h150 a16 16 0 0 1 16 16 v40 a16 16 0 0 1 -16 16 h-96 l-20 20 l2 -20 h-36 a16 16 0 0 1 -16 -16 v-40 a16 16 0 0 1 16 -16z" fill="#FFFDF8" stroke="#1E2A44" stroke-width="4" stroke-linejoin="round"/>
+            <text x="115" y="140" text-anchor="middle" font-family="'LXGW WenKai TC','Huninn',sans-serif" font-size="28" font-weight="700" fill="#E8457F">滋滋～</text>
+          </g>
+        </svg>
+      </div>
+      <div class="reveal">
+        <p class="kicker k-pink inline-flex items-center gap-2"><span class="live-dot inline-block h-2.5 w-2.5 rounded-full bg-tomato ring-2 ring-wood-800"></span>LIVE・現煎中</p>
+        <h2 class="mt-4 font-serif text-3xl font-bold leading-snug text-wood-900 sm:text-4xl lg:text-5xl">滋滋作響，<br />金黃脆底新鮮出爐！</h2>
+        <p class="mt-5 max-w-lg leading-relaxed text-wood-700">每一顆鍋貼都在點餐後才下鍋，師傅一鍋一鍋顧火、翻面，煎到冰花脆底金黃酥香，熱騰騰直接送到你手上。</p>
+        <ul class="mt-6 flex flex-wrap gap-3 text-sm font-bold text-wood-900">
+          <li class="doodle-box inline-flex items-center gap-1.5 rounded-full bg-cream-50 px-4 py-2"><i data-lucide="flame" class="h-4 w-4 text-tomato"></i>現點現煎</li>
+          <li class="doodle-box inline-flex items-center gap-1.5 rounded-full bg-cream-50 px-4 py-2"><i data-lucide="timer" class="h-4 w-4 text-ember-500"></i>約 8 分鐘出爐</li>
+          <li class="doodle-box inline-flex items-center gap-1.5 rounded-full bg-cream-50 px-4 py-2"><i data-lucide="sparkles" class="h-4 w-4 text-sky"></i>冰花薄脆底</li>
+        </ul>
+        <a href="#menu" data-menu-view="list" class="btn-doodle mt-8 inline-flex items-center gap-2 rounded-full bg-ember-500 px-7 py-3.5 font-bold text-white"><i data-lucide="utensils" class="h-5 w-5"></i>趁熱點一份</a>
+      </div>
+    </div>
   </section>
 
   <!-- =========================================================
