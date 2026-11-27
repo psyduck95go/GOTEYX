@@ -6,6 +6,17 @@
 <title>可愛反派狠餃色｜金黃酥脆，傳承手藝的極致美味</title>
 <meta name="description" content="可愛反派狠餃色－台灣在地豬肉、每日現包、現點現煎。線上點餐、冷凍禮盒宅配、門市據點資訊。" />
 
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#FFD23F" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="狠餃色" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
 <!-- Google Fonts：手寫感標題 LXGW WenKai TC ＋ 圓體內文 Huninn ＋ 英文手寫 Gaegu -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1079,6 +1090,10 @@ tailwind.config = {
 
 <!-- 右下角浮動按鈕：預約＋手機版購物車 -->
 <div class="fixed bottom-5 right-5 z-30 flex flex-col items-end gap-3">
+  <button id="fabInstall" type="button" class="btn-doodle hidden items-center gap-2 rounded-full bg-cream-50 py-3 pl-4 pr-5 text-wood-900" aria-label="把狠餃色安裝到裝置">
+    <img src="icons/favicon-48.png" alt="" class="h-6 w-6 rounded-full" />
+    <span class="text-sm font-bold">安裝 App</span>
+  </button>
   <a id="fabBooking" href="https://calendar.app.google/UCwJYXbU6d1R5aCK8" target="_blank" rel="noopener" class="btn-doodle inline-flex items-center gap-2 rounded-full bg-ember-500 py-3 pl-4 pr-5 text-white" aria-label="線上預約（另開新視窗）">
     <i data-lucide="calendar-check" class="h-5 w-5"></i>
     <span class="text-sm font-bold">線上預約</span>
@@ -1835,6 +1850,25 @@ tailwind.config = {
   updateHeader();
   observeReveals();
   refreshIcons();
+})();
+</script>
+<script>
+/* ---------- PWA：註冊 Service Worker ＋ 安裝按鈕 ---------- */
+(() => {
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service Worker 註冊失敗', err)));
+  }
+  const btn = document.getElementById('fabInstall');
+  let deferred = null;
+  const show = on => { btn.classList.toggle('hidden', !on); btn.classList.toggle('inline-flex', on); };
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; show(true); });
+  btn.addEventListener('click', async () => {
+    if (!deferred) return;
+    deferred.prompt();
+    try { await deferred.userChoice; } catch (e) {}
+    deferred = null; show(false);
+  });
+  window.addEventListener('appinstalled', () => { deferred = null; show(false); });
 })();
 </script>
 <script type="module">
