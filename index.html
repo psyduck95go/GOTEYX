@@ -823,7 +823,8 @@ tailwind.config = {
     <button type="button" class="absolute -right-3 -top-3 z-10 grid h-12 w-12 place-items-center rounded-full border-[2.5px] border-wood-800 bg-ember-500 text-white shadow-soft transition hover:scale-110" data-close-promo aria-label="關閉新品資訊"><i data-lucide="x" class="h-6 w-6" stroke-width="3"></i></button>
     <div class="doodle-box overflow-hidden rounded-3xl bg-cream-50 shadow-2xl">
       <img src="https://i.postimg.cc/j2YmMLV1/Chat-GPT-Image-2026nian8yue9ri-xia-wu06-20-57.png" alt="新產品資訊" class="block max-h-[70svh] w-full object-contain bg-cream-100" />
-      <div class="border-t-[2.5px] border-wood-800 p-4">
+      <div class="grid gap-3 border-t-[2.5px] border-wood-800 p-4 sm:grid-cols-2">
+        <a href="#menu" class="btn-doodle inline-flex items-center justify-center gap-2 rounded-full bg-ember-500 py-3 text-base font-bold text-white" data-close-promo><i data-lucide="shopping-bag" class="h-5 w-5"></i>立即點餐</a>
         <button type="button" class="btn-doodle w-full rounded-full bg-sun py-3 text-base font-bold text-wood-900" data-close-promo>我知道了，關閉</button>
       </div>
     </div>
@@ -1437,14 +1438,20 @@ tailwind.config = {
   });
   policyModal.addEventListener('click', e => { if (e.target.closest('[data-close-policy]')) { policyModal.classList.add('hidden'); policyModal.classList.remove('flex'); } });
 
-  /* ---------- 新品資訊 Popup（每次開啟網站顯示一次） ---------- */
+  /* ---------- 新品資訊 Popup（每位訪客每天最多顯示 3 次） ---------- */
   const promoModal = $('#promoModal');
-  const closePromo = () => { promoModal.classList.add('hidden'); promoModal.classList.remove('flex'); try { sessionStorage.setItem('promoSeen', '1'); } catch (e) {} };
+  const PROMO_KEY = 'promoViews', PROMO_MAX_PER_DAY = 3;
+  const today = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD（本地日期）
+  const closePromo = () => { promoModal.classList.add('hidden'); promoModal.classList.remove('flex'); };
   promoModal.addEventListener('click', e => { if (e.target.closest('[data-close-promo]')) closePromo(); });
   promoModal.querySelector('img').addEventListener('error', closePromo, { once: true });
-  let promoSeen = false;
-  try { promoSeen = sessionStorage.getItem('promoSeen') === '1'; } catch (e) {}
-  if (!promoSeen) setTimeout(() => { promoModal.classList.remove('hidden'); promoModal.classList.add('flex'); refreshIcons(); }, 600);
+  let promoLog = { date: today, count: 0 };
+  try { const saved = JSON.parse(localStorage.getItem(PROMO_KEY) || 'null'); if (saved && saved.date === today) promoLog = saved; } catch (e) {}
+  if (promoLog.count < PROMO_MAX_PER_DAY) setTimeout(() => {
+    promoModal.classList.remove('hidden'); promoModal.classList.add('flex'); refreshIcons();
+    promoLog.count += 1;
+    try { localStorage.setItem(PROMO_KEY, JSON.stringify(promoLog)); } catch (e) {}
+  }, 600);
 
   /* ESC 關閉所有浮層 */
   document.addEventListener('keydown', e => {
